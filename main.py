@@ -20,7 +20,24 @@ LINES = (
 )
 
 
+def validate_lines(lines) -> None:
+    """Each entry line must be exactly one non-empty sentence.
+
+    Guards against an accidental edit producing a blank line, a
+    multi-sentence line, or a line missing its final full stop.
+    """
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            raise ValueError("entry line must not be empty")
+        if stripped.count(".") != 1 or not stripped.endswith("."):
+            raise ValueError(f"entry line must be one sentence: {line!r}")
+        if "!" in stripped or "?" in stripped:
+            raise ValueError(f"entry line must end with a full stop: {line!r}")
+
+
 def main() -> None:
+    validate_lines(LINES)
     output_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
     output_dir.mkdir(parents=True, exist_ok=True)
     entry_path = output_dir / "entry.txt"
